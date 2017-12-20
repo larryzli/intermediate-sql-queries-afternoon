@@ -1,0 +1,269 @@
+------ PRACTICE JOINS ------
+
+-- PROBLEM 1 --
+/* SELECT * FROM Invoice i
+JOIN InvoiceLine il ON il.InvoiceId = i.InvoiceId
+WHERE UnitPrice > 0.99; */
+
+-- PROBLEM 2 --
+/* SELECT Invoice.InvoiceDate, Customer.FirstName, Customer.LastName, Invoice.Total
+FROM Invoice JOIN Customer ON Customer.CustomerId = Invoice.CustomerId; */
+
+-- PROBLEM 3 --
+/* SELECT Customer.FirstName, Customer.LastName, Employee.FirstName, Employee.LastName
+FROM Customer JOIN Employee ON Customer.SupportRepId = Employee.EmployeeId; */
+
+-- PROBLEM 4 --
+/* SELECT al.Title, art.Name 
+FROM Album al JOIN Artist art ON art.ArtistId = al.ArtistId; */
+
+-- PROBLEM 5 --
+/* SELECT pt.TrackId FROM PlaylistTrack pt JOIN Playlist pl ON pt.PlaylistId = pl.PlaylistId WHERE pl.name = "Music"; */
+
+-- PROBLEM 6 --
+/* SELECT Track.Name FROM Track JOIN PlaylistTrack ON Track.TrackId = PlaylistTrack.TrackId
+WHERE PlaylistTrack.PlaylistId = 5; */
+
+-- PROBLEM 7 --
+/* SELECT t.Name, p.Name 
+FROM Track t 
+JOIN PlaylistTrack pt ON t.TrackId = pt.TrackId
+JOIN Playlist p ON p.PlaylistId = pt.PlaylistId; */
+
+-- PROBLEM 8 --
+/* SELECT t.Name, a.Title
+FROM Album a
+JOIN Track t ON t.AlbumId = a.AlbumId
+JOIN Genre g ON t.GenreId = g.GenreId
+WHERE g.Name = "Alternative"; */
+
+-- BLACK DIAMOND --
+/* SELECT t.Name, g.Name, al.Title, art.Name
+FROM Artist art
+JOIN Album al ON al.ArtistId = art.ArtistId
+JOIN Track t ON t.AlbumId = al.AlbumId
+JOIN Genre g on g.GenreId = t.GenreId; */
+
+
+
+------ PRACTICE NESTED QUERIES ------
+
+-- PROBLEM 1 --
+/* SELECT * FROM invoice WHERE InvoiceId IN 
+(SELECT InvoiceId FROM InvoiceLine WHERE UnitPrice > 0.99); */
+
+-- PROBLEM 2 --
+/* SELECT * FROM PlaylistTrack WHERE TrackId IN 
+(SELECT TrackId FROM Playlist WHERE Name = 'Music'); */
+
+-- PROBLEM 3 --
+/* SELECT Name FROM Track WHERE TrackId IN
+(SELECT TrackId FROM PlaylistTrack WHERE PlaylistId = 5); */
+
+-- PROBLEM 4 --
+/* SELECT * FROM Track WHERE GenreId IN
+(SELECT GenreId FROM Genre WHERE Name = 'Comedy'); */
+
+-- PROBLEM 5 --
+/* SELECT * FROM Track WHERE AlbumId IN
+(SELECT AlbumId FROM Album WHERE Title = 'Fireball'); */
+
+-- PROBLEM 6 --
+/* SELECT * FROM Track WHERE AlbumId IN
+(SELECT AlbumId FROM Album WHERE ArtistId IN
+(SELECT ArtistId FROM Artist WHERE Name = 'Queen')); */
+
+
+
+------ PRACTICE UPDATING ROWS ------
+
+-- PROBLEM 1 --
+/* UPDATE Customer
+SET Fax = null
+WHERE Fax IS NOT NULL; */
+
+-- PROBLEM 2 --
+/* UPDATE Customer
+SET Company = 'Self'
+WHERE Company IS NULL; */
+
+-- PROBLEM 3 --
+/* UPDATE Customer
+SET LastName = 'Thompson'
+WHERE FirstName = 'Julia' AND LastName = 'Barnett'; */
+
+-- PROBLEM 4 --
+/* UPDATE Customer
+SET SupportRepId = 4
+WHERE Email = 'luisrojas@yahoo.cl'; */
+
+-- PROBLEM 5 -- 
+/* UPDATE Track
+SET Composer = 'The darkness around us'
+WHERE GenreId IN
+(SELECT GenreId FROM Genre WHERE name = 'Metal'); */
+
+
+------ PRACTICE GROUP BY ------
+
+-- PROBLEM 1 --
+/* SELECT g.Name, COUNT(*) AS total_tracks 
+FROM Genre g 
+JOIN Track t ON t.GenreId = g.GenreId 
+GROUP BY g.GenreId; */
+
+-- PROBLEM 2 --
+/* SELECT COUNT(*) AS total_tracks, g.Name 
+FROM Track t
+JOIN Genre g ON t.GenreId = g.GenreId
+WHERE g.Name = 'Pop' OR g.Name = 'Rock'
+GROUP BY g.GenreId; */
+
+-- PROBLEM 3 --
+/* SELECT a.Name, COUNT(*) AS total_albums 
+FROM Artist a
+JOIN Album al ON al.ArtistId = a.ArtistId
+GROUP BY al.ArtistId; */
+
+
+
+------ PRACTICE DISTINCT ------
+
+-- PROBLEM 1 --
+/* SELECT DISTINCT Composer FROM Track; */
+
+-- PROBLEM 2 --
+/* SELECT DISTINCT BillingPostalCode FROM Invoice; */
+
+-- PROBLEM 3 --
+/* SELECT DISTINCT Company FROM Customer; */
+
+
+
+------ PRACTICE DELETE ROWS ------
+
+-- PROBLEM 2 --
+/* DELETE FROM practice_delete WHERE Type = 'bronze'; */
+
+-- PROBLEM 3 --
+/* DELETE FROM practice_delete WHERE type = 'silver'; */
+
+-- PROBLEM 4 --
+/* DELETE FROM practice_delete WHERE value = 150; */
+
+
+
+------ ECOMMERCE SIMULATION ------
+
+-- CREATE TABLES --
+/* CREATE TABLE users (
+  id integer primary key autoincrement,
+  user_name varChar(50),
+  user_email varChar(80)
+); */
+
+/* CREATE TABLE products (
+  id integer primary key autoincrement,
+  product_name varChar(50),
+  product_price float
+); */
+
+
+/* CREATE TABLE orders (
+  order_number integer,
+  product_id integer,
+  FOREIGN KEY(product_id) REFERENCES products(id)
+);  */
+
+-- INSERT DATA --
+/* INSERT INTO users (user_name, user_email)
+VALUES
+('Larry', 'larry@email.com'),
+('Jin', 'jeff@buff.com'),
+('Thuan', 'duma@vietnam.com'); */
+
+/* INSERT INTO products (product_name, product_price)
+VALUES
+('Macbook Pro', 2499.99),
+('Nintendo Switch', 299.99),
+('Candy', 2.41); */
+
+/* INSERT INTO orders (order_number, product_id)
+VALUES
+(1, 1),
+(1, 1),
+(1, 3),
+(1, 3),
+(2, 2),
+(2, 2),
+(3, 1),
+(3, 2),
+(3, 3); */
+
+-- RUN QUERIES --
+/* SELECT * FROM users;
+SELECT * FROM products;
+SELECT * FROM orders; */
+
+/* SELECT * FROM orders WHERE order_number = 1; */
+
+/* SELECT o.order_number, ROUND(SUM(p.product_price), 2) AS order_total
+FROM orders o JOIN products p
+ON o.product_id = p.id
+GROUP BY o.order_number; */
+
+-- ADD FOREIGN KEY REF --
+/* ALTER TABLE orders
+ADD COLUMN user_id integer REFERENCES users(id); */
+
+-- UPDATE ORDERS TO REFERENCE USERS --
+/* UPDATE orders
+SET user_id = 3
+WHERE order_number = 1; */
+
+/* UPDATE orders
+SET user_id = 1
+WHERE order_number = 2; */
+
+/* UPDATE orders
+SET user_id = 2
+WHERE order_number = 3; */
+
+-- MORE QUERIES --
+/* SELECT * FROM orders WHERE user_id = 1;
+SELECT * FROM orders WHERE user_id = 2;
+SELECT * FROM orders WHERE user_id = 3; */
+
+/* INSERT INTO orders (order_number, product_id, user_id)
+VALUES
+(4, 1, 1),
+(4, 1, 1),
+(4, 3, 1),
+(5, 3, 3),
+(5, 2, 3),
+(5, 2, 3),
+(6, 1, 2),
+(6, 2, 2),
+(7, 3, 1); */
+
+/* SELECT o.order_number, u.user_name FROM orders o
+JOIN users u
+ON u.id = o.user_id
+WHERE u.user_name = 'Larry'; */
+
+/* SELECT o.order_number, u.user_name FROM orders o
+JOIN users u
+ON u.id = o.user_id
+WHERE u.id = 2; */
+
+/* SELECT o.order_number, u.user_name FROM orders o
+JOIN users u
+ON u.id = o.user_id
+WHERE o.user_id = 3; */
+
+-- BLACK DIAMOND -- 
+/* SELECT u.user_name, ROUND(SUM(p.product_price), 2) as total_all_orders
+FROM users u 
+JOIN orders o ON u.id = o.user_id
+JOIN products p ON o.product_id = p.id
+GROUP BY u.id; */
